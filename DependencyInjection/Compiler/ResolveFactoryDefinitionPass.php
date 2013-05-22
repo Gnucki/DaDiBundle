@@ -12,9 +12,12 @@
 namespace Da\DiBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Da\DiBundle\DependencyInjection\Definition\DefinitionExtraInterface;
 
 /**
  * This compiler pass handle the factory parameter of the definition.
@@ -23,9 +26,12 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class ResolveFactoryDefinitionPass implements CompilerPassInterface
 {
+    /**
+     * The container.
+     *
+     * @var ContainerInterface
+     */
     private $container;
-    private $compiler;
-    private $formatter;
 
     /**
      * Process the ContainerBuilder.
@@ -35,14 +41,13 @@ class ResolveFactoryDefinitionPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $this->container = $container;
-        $this->compiler = $container->getCompiler();
-        $this->formatter = $this->compiler->getLoggingFormatter();
 
-        foreach (array_keys($container->getDefinitions()) as $id) {
+        foreach (array_keys($container->getDefinitions()) as $id) 
+        {
             // yes, we are specifically fetching the definition from the
             // container to ensure we are not operating on stale data
             $definition = $container->getDefinition($id);
-            if (!$definition instanceof AdditionalDefinitionInterface)
+            if (!$definition instanceof DefinitionExtraInterface || !$definition->getExtra('factory'))
                 continue;
 
             $this->resolveDefinition($id, $definition);
@@ -52,87 +57,67 @@ class ResolveFactoryDefinitionPass implements CompilerPassInterface
     /**
      * Resolves the definition
      *
-     * @param string              $id         The definition identifier
-     * @param DefinitionDecorator $definition
+     * @param string              $id         The identifier of the definition.
+     * @param DefinitionDecorator $definition The definition.
      *
      * @return Definition
-     *
-     * @throws \RuntimeException When the definition is invalid
      */
-    private function resolveDefinition($id, DefinitionDecorator $definition)
+    private function resolveDefinition($id, DefinitionExtraInterface $definition)
     {
-        $def = new Definition();
+        $factory = $definition->getExtra('factory');
 
-        // merge in parent definition
-        // purposely ignored attributes: scope, abstract, tags
-        $def->setClass($parentDef->getClass());
-        $def->setArguments($parentDef->getArguments());
-        $def->setMethodCalls($parentDef->getMethodCalls());
-        $def->setProperties($parentDef->getProperties());
-        $def->setFactoryClass($parentDef->getFactoryClass());
-        $def->setFactoryMethod($parentDef->getFactoryMethod());
-        $def->setFactoryService($parentDef->getFactoryService());
-        $def->setConfigurator($parentDef->getConfigurator());
-        $def->setFile($parentDef->getFile());
-        $def->setPublic($parentDef->isPublic());
-
-        // overwrite with values specified in the decorator
-        $changes = $definition->getChanges();
-        if (isset($changes['class'])) {
-            $def->setClass($definition->getClass());
-        }
-        if (isset($changes['factory_class'])) {
+        foreach ($factory->getServices() as $manufactoredServiceId) 
+        {
+            // Override the global parameters of the factory with individual ones.
+            $def = new Definition();
+            $def->setArguments($definition->getArguments());
+            $def->setMethodCalls($definition->getMethodCalls());
+            $def->setProperties($definition->getProperties());
             $def->setFactoryClass($definition->getFactoryClass());
-        }
-        if (isset($changes['factory_method'])) {
             $def->setFactoryMethod($definition->getFactoryMethod());
-        }
-        if (isset($changes['factory_service'])) {
             $def->setFactoryService($definition->getFactoryService());
-        }
-        if (isset($changes['configurator'])) {
             $def->setConfigurator($definition->getConfigurator());
-        }
-        if (isset($changes['file'])) {
             $def->setFile($definition->getFile());
-        }
-        if (isset($changes['public'])) {
             $def->setPublic($definition->isPublic());
+            $def->setAbstract(false);
+            $def->setScope($definition->getScope());
+            $def->setTags($definition->getTags());
+
+            $manufactoredServiceDef = $this->container->getDefinition($manufactoredServiceId);
+            if ($manufactoredServiceDef->getClass())
+                $def->setClass($manufactoredServiceDef->getClass());
+            if ($manufactoredServiceDef->getFactoryClass())
+                $def->setFactoryClass($manufactoredServiceDef->getFactoryClass());
+            if ($manufactoredServiceDef->getFactoryMethod())
+                $def->setFactoryMethod($manufactoredServiceDef->getFactoryMethod());
+            if ($manufactoredServiceDef->getFactoryService())
+                $def->setFactoryService($manufactoredServiceDef->getFactoryService());
+            if ($manufactoredServiceDef->getConfigurator())
+                $def->setConfigurator($manufactoredServiceDef->getConfigurator());
+            if ($manufactoredServiceDef->getFile())
+                $def->setFile($manufactoredServiceDef->getFile());
+            if ($manufactoredServiceDef->isPublic() !== null)
+                $def->setPublic($manufactoredServiceDef->isPublic());
+            if ($manufactoredServiceDef->getArguments())
+                $def->setArguments($manufactoredServiceDef->getArguments());
+            if ($manufactoredServiceDef->getProperties())
+                $def->setProperties($manufactoredServiceDef->getProperties());
+            if ($manufactoredServiceDef->getMethodCalls())
+                $def->setMethodCalls($manufactoredServiceDef->getMethodCalls());
+            if ($manufactoredServiceDef->isAbstract() !== null)
+                $def->setAbstract($manufactoredServiceDef->isAbstract());
+            if ($manufactoredServiceDef->getScope())
+                $def->setScope($manufactoredServiceDef->getScope());
+            if ($manufactoredServiceDef->getTags())
+                $def->setTags($manufactoredServiceDef->getTags());
+            
+            $this->container->setDefinition($manufactoredServiceId, $def);
         }
 
-        // merge arguments
-        foreach ($definition->getArguments() as $k => $v) {
-            if (is_numeric($k)) {
-                $def->addArgument($v);
-                continue;
-            }
-
-            if (0 !== strpos($k, 'index_')) {
-                throw new RuntimeException(sprintf('Invalid argument key "%s" found.', $k));
-            }
-
-            $index = (integer) substr($k, strlen('index_'));
-            $def->replaceArgument($index, $v);
-        }
-
-        // merge properties
-        foreach ($definition->getProperties() as $k => $v) {
-            $def->setProperty($k, $v);
-        }
-
-        // append method calls
-        if (count($calls = $definition->getMethodCalls()) > 0) {
-            $def->setMethodCalls(array_merge($def->getMethodCalls(), $calls));
-        }
-
-        // these attributes are always taken from the child
-        $def->setAbstract($definition->isAbstract());
-        $def->setScope($definition->getScope());
-        $def->setTags($definition->getTags());
-
-        // set new definition on container
+        $def = new Definition();
+        $def->setClass('Da\DiBundle\DependencyInjection\Service\ServiceFactory');
+        $def->setArguments(array($id, new Reference('service_container')));
+        $def->setPublic(true);
         $this->container->setDefinition($id, $def);
-
-        return $def;
     }
 }

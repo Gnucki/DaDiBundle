@@ -1,3 +1,7 @@
-parameters:
-
 services:
+    da.test:
+        factory:
+            test1:
+                class: Da\DiBundle\Core\Test1 
+            test2:
+                class: Da\DiBundle\Core\Test2 

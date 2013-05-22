@@ -12,6 +12,8 @@
 namespace Da\DiBundle\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Config\FileLocatorInterface;
 
 /**
  * AbstractYamlFileLoaderDecorator is an absctract class that a decorator 
@@ -28,6 +30,20 @@ abstract class AbstractYamlFileLoaderDecorator extends YamlFileLoader
 	 */
 	protected $parent;
 
+    /**
+     * Constructor.
+     *
+     * @param ContainerBuilder     $container A ContainerBuilder instance.
+     * @param FileLocatorInterface $locator   A FileLocator instance.
+     * @param YamlFileLoader       $parent    The parent (see pattern).
+     */
+    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, YamlFileLoader $parent)
+    {
+        $this->setParent($parent);
+
+        parent::__construct($container, $locator);
+    }
+
 	/**
      * Set the parent of the decorator (see the pattern).
      *
@@ -41,8 +57,8 @@ abstract class AbstractYamlFileLoaderDecorator extends YamlFileLoader
     /**
 	 * {@inheritdoc}
 	 */
-    protected function parseAdditionalDefinition($id, $service, $file, Definition $definition)
+    protected function parseExtraDefinition($id, $service, $file, Definition $definition)
     {
-        return $this->parent()->parseAdditionalDefinition($id, $service, $file, $definition);
+        return $this->parent->parseExtraDefinition($id, $service, $file, $definition);
     }
 }

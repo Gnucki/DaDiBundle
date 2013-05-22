@@ -12,6 +12,7 @@
 namespace Da\DiBundle\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\Definition;
+use Da\DiBundle\DependencyInjection\Definition\FactoryExtraDefinition;
 
 /**
  * FactoryYamlFileLoaderDecorator is a decorator that add the factory parameter 
@@ -24,35 +25,32 @@ class FactoryYamlFileLoaderDecorator extends AbstractYamlFileLoaderDecorator
     /**
 	 * {@inheritdoc}
 	 */
-    protected function parseAdditionalDefinition($id, $service, $file, Definition $definition)
+    protected function parseExtraDefinition($id, $service, $file, Definition $definition)
     {
+        $def = $definition;
+
     	if (isset($service['factory'])) 
     	{
-    		$def = new FactoryDefinition();
-    		$def->...($definition);
+            // Parse the extra definition.
+            $factoryExtra = new FactoryExtraDefinition();
+            if (!is_array($service['factory']))
+                throw new InvalidArgumentException(sprintf('Parameter "factory" must be an array for service "%s" in %s.', $id, $file));
 
-            if (!is_array($service['tags'])) {
-                throw new InvalidArgumentException(sprintf('Parameter "tags" must be an array for service "%s" in %s.', $id, $file));
+            foreach ($service['factory'] as $manufactoredServiceId => $manufactoredService) 
+            {
+                $manufactoredServiceId = $id.'.'.$manufactoredServiceId;
+                $this->DUPLICATED_parseDefinition($manufactoredServiceId, $manufactoredService, $file);
+                $manufactoredServiceDef = $this->container->getDefinition($manufactoredServiceId);
+                $this->parseExtraDefinition($manufactoredServiceId, $manufactoredService, $file, $manufactoredServiceDef);
+                $factoryExtra->addService($manufactoredServiceId);
             }
 
-            foreach ($service['tags'] as $tag) {
-                if (!isset($tag['name'])) {
-                    throw new InvalidArgumentException(sprintf('A "tags" entry is missing a "name" key for service "%s" in %s.', $id, $file));
-                }
-
-                $name = $tag['name'];
-                unset($tag['name']);
-
-                foreach ($tag as $attribute => $value) {
-                    if (!is_scalar($value)) {
-                        throw new InvalidArgumentException(sprintf('A "tags" attribute must be of a scalar-type for service "%s", tag "%s" in %s.', $id, $name, $file));
-                    }
-                }
-
-                $definition->addTag($name, $tag);
-            }
+            // Add the extra definition to the definition.
+            $def = $this->getDefinitionExtra($definition);
+            $def->setExtra('factory', $factoryExtra);
+            $def->setAbstract(true);
         }
 
-        return $this->parent->parseAdditionalDefinition($id, $service, $file, $def);
+        return $this->parent->parseExtraDefinition($id, $service, $file, $def);
     }
 }

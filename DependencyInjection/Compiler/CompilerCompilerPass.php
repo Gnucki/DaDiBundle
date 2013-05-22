@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Da\LessBundle\DependencyInjection\Compiler;
+namespace Da\DiBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;

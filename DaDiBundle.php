@@ -9,18 +9,21 @@
  * file that was distributed with this source code.
  */
 
-namespace Da\LessBundle;
+namespace Da\DiBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Da\LessBundle\DependencyInjection\Compiler\CompilerCompilerPass;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Da\DiBundle\DependencyInjection\Loader\YamlFileLoader;
+use Da\DiBundle\DependencyInjection\Compiler\ResolveFactoryDefinitionPass;
 
-class DaLessBundle extends Bundle
+class DaDiBundle extends Bundle
 {
 	public function build(ContainerBuilder $container)
     {
         parent::build($container);
 
-        $container->addCompilerPass(new CompilerCompilerPass());
+		YamlFileLoader::addDecorator('Da\DiBundle\DependencyInjection\Loader\FactoryYamlFileLoaderDecorator');
+        $container->addCompilerPass(new ResolveFactoryDefinitionPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
     }
 }

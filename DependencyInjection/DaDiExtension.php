@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Da\LessBundle\DependencyInjection;
+namespace Da\DiBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\DependencyInjection\Loader;
+use Da\DiBundle\DependencyInjection\Loader\YamlFileLoader;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -31,17 +31,7 @@ class DaDiExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = YamlFileLoader::decorate($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
-
-        $compilationConfig = array();
-        if (isset($config['compilation']))
-            $compilationConfig = $config['compilation'];
-        $container->setParameter('da.di.config.compilation', $compilationConfig);
-
-        $rolesConfig = array('ROLE_ADMIN');
-        if (isset($config['roles']))
-            $rolesConfig = $config['roles'];
-        $container->setParameter('da.di.config.roles', $rolesConfig);
     }
 }
