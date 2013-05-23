@@ -150,10 +150,10 @@ class YamlFileLoader extends BaseYamlFileLoader
      */
     protected function getDefinitionExtra(Definition $definition)
     {
-        if ($definition instanceof DefinitionExtra || $definition instanceof DefinitionDecoratorExtra)
+        if ($definition instanceof DefinitionExtraInterface)
             return $definition;
         else if ($definition instanceof DefinitionDecorator)
-            $def = new DefinitionDecoratorExtra($definition);
+            $def = new DefinitionDecoratorExtra($definition); // PARENT???
         else
             $def = new DefinitionExtra($definition);
         return $def;

@@ -18,6 +18,8 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Da\DiBundle\DependencyInjection\Definition\DefinitionExtraInterface;
+use Da\DiBundle\DependencyInjection\Definition\DefinitionExtra;
+use Da\DiBundle\DependencyInjection\Definition\DefinitionDecoratorExtra;
 
 /**
  * This compiler pass handle the factory parameter of the definition.
@@ -55,7 +57,7 @@ class ResolveFactoryDefinitionPass implements CompilerPassInterface
     }
 
     /**
-     * Resolves the definition
+     * Resolve the definition.
      *
      * @param string              $id         The identifier of the definition.
      * @param DefinitionDecorator $definition The definition.
@@ -69,21 +71,16 @@ class ResolveFactoryDefinitionPass implements CompilerPassInterface
         foreach ($factory->getServices() as $manufactoredServiceId) 
         {
             // Override the global parameters of the factory with individual ones.
-            $def = new Definition();
-            $def->setArguments($definition->getArguments());
-            $def->setMethodCalls($definition->getMethodCalls());
-            $def->setProperties($definition->getProperties());
-            $def->setFactoryClass($definition->getFactoryClass());
-            $def->setFactoryMethod($definition->getFactoryMethod());
-            $def->setFactoryService($definition->getFactoryService());
-            $def->setConfigurator($definition->getConfigurator());
-            $def->setFile($definition->getFile());
-            $def->setPublic($definition->isPublic());
-            $def->setAbstract(false);
-            $def->setScope($definition->getScope());
-            $def->setTags($definition->getTags());
-
             $manufactoredServiceDef = $this->container->getDefinition($manufactoredServiceId);
+            echo 3;
+            var_dump($manufactoredServiceDef);
+            if ($manufactoredServiceDef instanceof DefinitionDecorator)
+                $def = new DefinitionDecoratorExtra($definition, $manufactoredServiceDef->getParent());
+            else
+                $def = new DefinitionExtra($definition);
+            $def->setAbstract(false);
+
+            $def->setClass('');
             if ($manufactoredServiceDef->getClass())
                 $def->setClass($manufactoredServiceDef->getClass());
             if ($manufactoredServiceDef->getFactoryClass())
@@ -110,10 +107,19 @@ class ResolveFactoryDefinitionPass implements CompilerPassInterface
                 $def->setScope($manufactoredServiceDef->getScope());
             if ($manufactoredServiceDef->getTags())
                 $def->setTags($manufactoredServiceDef->getTags());
+            $def->unsetExtra('factory');
+            if (($extras = $manufactoredServiceDef->getExtras()))
+            {
+                foreach ($extras as $extraId => $extra)
+                {
+                    $def->setExtra($extraId, $extra);
+                }
+            }
             
             $this->container->setDefinition($manufactoredServiceId, $def);
         }
 
+        // Set the factory service as a factory.
         $def = new Definition();
         $def->setClass('Da\DiBundle\DependencyInjection\Service\ServiceFactory');
         $def->setArguments(array($id, new Reference('service_container')));

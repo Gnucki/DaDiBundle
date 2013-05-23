@@ -22,22 +22,19 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 class DefinitionDecoratorExtra extends DefinitionDecorator implements DefinitionExtraInterface
 {
 	/**
-	 * The content of the loaded file.
-	 *
-	 * @var mixed
-	 */
-	private $extraDefinitions = array();
-
-	/**
      * Constructor.
      *
      * @param Definition $definition The definition to extend.
+     * @param string $parent The id of Definition instance to decorate.
      */
-    public function __construct(Definition $definition = null)
+    public function __construct(Definition $definition = null, $parent)
     {
-        $this->assimilateDefinition($definition);
+        $this->implementor = new DefinitionExtraImplementor($this);
 
-        parent::__construct();
+        parent::__construct($parent);
+
+        if ($definition)
+            $this->assimilateDefinition($definition);
     }
 
     /**
@@ -45,18 +42,7 @@ class DefinitionDecoratorExtra extends DefinitionDecorator implements Definition
 	 */
     public function assimilateDefinition(Definition $definition)
     {
-        $this->setArguments($definition->getArguments());
-        $this->setMethodCalls($definition->getMethodCalls());
-        $this->setProperties($definition->getProperties());
-        $this->setFactoryClass($definition->getFactoryClass());
-        $this->setFactoryMethod($definition->getFactoryMethod());
-        $this->setFactoryService($definition->getFactoryService());
-        $this->setConfigurator($definition->getConfigurator());
-        $this->setFile($definition->getFile());
-        $this->setPublic($definition->isPublic());
-        $this->setAbstract($definition->isAbstract());
-        $this->setScope($definition->getScope());
-        $this->setTags($definition->getTags());
+        $this->implementor->assimilateDefinition($definition);
     }
 
 	/**
@@ -64,7 +50,7 @@ class DefinitionDecoratorExtra extends DefinitionDecorator implements Definition
 	 */
 	public function getExtra($id)
 	{
-		return (isset($this->extraDefinitions[$id]) ? $this->extraDefinitions[$id] : null);
+        return $this->implementor->getExtra($id);
 	}
 
 	/**
@@ -72,6 +58,30 @@ class DefinitionDecoratorExtra extends DefinitionDecorator implements Definition
 	 */
 	public function setExtra($id, ExtraDefinitionInterface $extraDefinition)
 	{
-		$this->extraDefinitions[$id] = $extraDefinition;
+        $this->implementor->setExtra($id, $extraDefinition);
 	}
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unsetExtra($id)
+    {
+        $this->implementor->unsetExtra($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtras()
+    {
+        return $this->implementor->getExtras();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtras(array $extraDefinitions)
+    {
+        $this->implementor->setExtras($extraDefinitions);
+    }
 }

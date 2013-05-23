@@ -35,43 +35,59 @@ class DefinitionExtra extends Definition implements DefinitionExtraInterface
      */
     public function __construct(Definition $definition = null)
     {
-        $this->assimilateDefinition($definition);
+        $this->implementor = new DefinitionExtraImplementor($this);
 
         parent::__construct();
+
+        if ($definition)
+            $this->assimilateDefinition($definition);
     }
 
     /**
-	 * {@inheritdoc}
-	 */
+     * {@inheritdoc}
+     */
     public function assimilateDefinition(Definition $definition)
     {
-        $this->setArguments($definition->getArguments());
-        $this->setMethodCalls($definition->getMethodCalls());
-        $this->setProperties($definition->getProperties());
-        $this->setFactoryClass($definition->getFactoryClass());
-        $this->setFactoryMethod($definition->getFactoryMethod());
-        $this->setFactoryService($definition->getFactoryService());
-        $this->setConfigurator($definition->getConfigurator());
-        $this->setFile($definition->getFile());
-        $this->setPublic($definition->isPublic());
-        $this->setAbstract($definition->isAbstract());
-        $this->setScope($definition->getScope());
-        $this->setTags($definition->getTags());
+        $this->implementor->assimilateDefinition($definition);
     }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function getExtra($id)
-	{
-		return (isset($this->extraDefinitions[$id]) ? $this->extraDefinitions[$id] : null);
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtra($id)
+    {
+        return $this->implementor->getExtra($id);
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function setExtra($id, ExtraDefinitionInterface $extraDefinition)
-	{
-		$this->extraDefinitions[$id] = $extraDefinition;
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtra($id, ExtraDefinitionInterface $extraDefinition)
+    {
+        $this->implementor->setExtra($id, $extraDefinition);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unsetExtra($id)
+    {
+        $this->implementor->unsetExtra($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtras()
+    {
+        return $this->implementor->getExtras();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtras(array $extraDefinitions)
+    {
+        $this->implementor->setExtras($extraDefinitions);
+    }
 }

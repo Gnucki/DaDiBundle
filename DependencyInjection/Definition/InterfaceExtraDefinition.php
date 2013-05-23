@@ -17,32 +17,32 @@ namespace Da\DiBundle\DependencyInjection\Definition;
  *
  * @author Thomas Prelot
  */
-class FactoryExtraDefinition implements ExtraDefinitionInterface
+class InterfaceExtraDefinition implements ExtraDefinitionInterface
 {
 	/**
 	 * The list of the services.
 	 *
-	 * @var array
+	 * @var string
 	 */
-	private $services = array();
+	private $name;
 
 	/**
-	 * Add a service.
+	 * Set the name of the interface.
 	 *
-	 * @param string $id The id of the service.
+	 * @param string $name The name of the interface.
 	 */
-	public function addService($id)
+	public function setName($name)
 	{
-		$this->services[$id] = $id;
+		$this->name = $name;
 	}
 
 	/**
-	 * Get the list of the services.
+	 * Get the name of the interface.
 	 *
-	 * @return array The services.
+	 * @return array The name of the interface.
 	 */
-	public function getServices()
+	public function getName()
 	{
-		return $this->services;
+		return $this->name;
 	}
 }
