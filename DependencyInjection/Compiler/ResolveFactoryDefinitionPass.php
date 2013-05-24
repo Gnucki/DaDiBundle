@@ -72,8 +72,6 @@ class ResolveFactoryDefinitionPass implements CompilerPassInterface
         {
             // Override the global parameters of the factory with individual ones.
             $manufactoredServiceDef = $this->container->getDefinition($manufactoredServiceId);
-            echo 3;
-            var_dump($manufactoredServiceDef);
             if ($manufactoredServiceDef instanceof DefinitionDecorator)
                 $def = new DefinitionDecoratorExtra($definition, $manufactoredServiceDef->getParent());
             else

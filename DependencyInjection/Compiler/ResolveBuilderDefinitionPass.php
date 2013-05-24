@@ -18,13 +18,15 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Da\DiBundle\DependencyInjection\Definition\DefinitionExtraInterface;
+use Da\DiBundle\DependencyInjection\Definition\DefinitionExtra;
+use Da\DiBundle\DependencyInjection\Definition\DefinitionDecoratorExtra;
 
 /**
- * This compiler pass handle the interface parameter of the definition.
+ * This compiler pass handle the factory parameter of the definition.
  *
  * @author Thomas Prelot
  */
-class CheckInterfaceValidityPass implements CompilerPassInterface
+class ResolveBuilderDefinitionPass implements CompilerPassInterface
 {
     /**
      * The container.
@@ -47,28 +49,27 @@ class CheckInterfaceValidityPass implements CompilerPassInterface
             // yes, we are specifically fetching the definition from the
             // container to ensure we are not operating on stale data
             $definition = $container->getDefinition($id);
-            if (!$definition instanceof DefinitionExtraInterface || !$definition->getExtra('interface'))
+            if (!$definition instanceof DefinitionExtraInterface || !$definition->getExtra('builder'))
                 continue;
 
-            $this->checkDefinition($id, $definition);
+            $this->resolveDefinition($id, $definition);
         }
     }
 
     /**
-     * Check the definition.
+     * Resolve the definition.
      *
      * @param string              $id         The identifier of the definition.
      * @param DefinitionDecorator $definition The definition.
      *
      * @return Definition
      */
-    private function checkDefinition($id, DefinitionExtraInterface $definition)
+    private function resolveDefinition($id, DefinitionExtraInterface $definition)
     {
-        $interfaceName = $definition->getExtra('interface')->getName();
-        $className = $definition->getClass();
+        $builder = $definition->getExtra('builder');
 
-        $class = new \ReflectionClass($className);
-        if (!$class->implementsInterface($interfaceName))
-        	throw new \InvalidArgumentException('The "'.$className.'" class of the "'.$id.'" service should implement the "'.$interfaceName.'" interface.');
+        $definition->setFactoryClass($builder->getClass());
+        $definition->setFactoryMethod($builder->getMethod());
+        $definition->setFactoryService($builder->getService());
     }
 }

@@ -21,12 +21,12 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class DefinitionExtra extends Definition implements DefinitionExtraInterface
 {
-	/**
-	 * The content of the loaded file.
-	 *
-	 * @var mixed
-	 */
-	private $extraDefinitions = array();
+    /**
+     * The implementor (see bridge pattern).
+     *
+     * @var DefinitionExtraImplementor
+     */
+    private $implementor = array();
 
 	/**
      * Constructor.

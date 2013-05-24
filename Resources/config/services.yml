@@ -1,7 +1,11 @@
 services:
     da.test:
+        interface: Da\DiBundle\Core\TestInterface
         factory:
             test1:
+                builder: da.test.builder
                 class: Da\DiBundle\Core\Test1 
             test2:
-                class: Da\DiBundle\Core\Test2 
+                class: Da\DiBundle\Core\Test2
+    da.test.builder:
+        class: Da\DiBundle\Core\TestBuilder

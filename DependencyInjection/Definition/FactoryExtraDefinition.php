@@ -12,8 +12,8 @@
 namespace Da\DiBundle\DependencyInjection\Definition;
 
 /**
- * This definition allows to add extra definition parameters
- * to a definition.
+ * This definition allows to add the extra definition parameters
+ * factory to a definition.
  *
  * @author Thomas Prelot
  */

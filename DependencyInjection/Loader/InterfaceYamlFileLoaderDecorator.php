@@ -12,7 +12,7 @@
 namespace Da\DiBundle\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\Definition;
-use Da\DiBundle\DependencyInjection\Definition\FactoryExtraDefinition;
+use Da\DiBundle\DependencyInjection\Definition\InterfaceExtraDefinition;
 
 /**
  * InterfaceYamlFileLoaderDecorator is a decorator that add the interface parameter 

@@ -51,11 +51,26 @@ class YamlFileLoader extends BaseYamlFileLoader
 	/**
      * Add a decorator to this class.
      *
-     * @param string $decorator A decorator class name.
+     * @param string  $decoratorClassName A decorator class name.
+     * @param integer $order     The order.
      */
-	public static function addDecorator($decorator)
+	public static function addDecorator($decoratorClassName, $order = 0)
 	{
-		self::$decorators[] = $decorator;
+        if (!is_int($order))
+            throw new \InvalidArgumentException('The order must be an integer.');
+
+        $isDecoratorAdded = false;
+        foreach (self::$decorators as $i => $decorator)
+        {
+            if ($order < $decorator['order'])
+            {
+                self::$decorators = array_merge(array_slice(self::$decorators, 0, $i), array(array('order' => $order, 'name' => $decoratorClassName)), array_values(array_slice(self::$decorators, $i)));
+                $isDecoratorAdded = true;
+            }
+            
+        }
+        if (!$isDecoratorAdded)
+           self::$decorators[] = array('order' => $order, 'name' => $decoratorClassName);
 	}
 
 	/**
@@ -65,15 +80,24 @@ class YamlFileLoader extends BaseYamlFileLoader
      * @param FileLocatorInterface $locator   A FileLocator instance.
      *
 	 * @return YamlFileLoaderDecorator The decorated instance of the class.
+     *
+     * @throws InvalidArgumentException if the container is not specified for the initialisation of the decorators.
+     * @throws InvalidArgumentException if the locator is not specified for the initialisation of the decorators.
 	 */
-	public static function decorate(ContainerBuilder $container, FileLocatorInterface $locator)
+	public static function decorate(ContainerBuilder $container = null, FileLocatorInterface $locator = null)
 	{
 		if (!self::$decoratedInstance)
 		{
+            if (!$container)
+                throw new \InvalidArgumentException('The container must be specified for the initialisation of the decorators.');
+            else if (!$locator)
+                throw new \InvalidArgumentException('The locator must be specified for the initialisation of the decorators.');
+
 			self::$decoratedInstance = new YamlFileLoader($container, $locator);
-			foreach (self::$decorators as $decorator)
+            $decorators = self::$decorators;
+			while (($decorator = array_pop($decorators)))
 			{
-                self::$decoratedInstance = new $decorator($container, $locator, self::$decoratedInstance);
+                self::$decoratedInstance = new $decorator['name']($container, $locator, self::$decoratedInstance);
 			}
 		}
 		return self::$decoratedInstance;

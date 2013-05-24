@@ -2,7 +2,7 @@
 
 namespace Da\DiBundle\Core;
 
-class Test2
+class Test2 implements TestInterface
 {
 	public function test()
 	{

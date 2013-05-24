@@ -21,6 +21,13 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
  */
 class DefinitionDecoratorExtra extends DefinitionDecorator implements DefinitionExtraInterface
 {
+    /**
+     * The implementor (see bridge pattern).
+     *
+     * @var DefinitionExtraImplementor
+     */
+    private $implementor = array();
+    
 	/**
      * Constructor.
      *

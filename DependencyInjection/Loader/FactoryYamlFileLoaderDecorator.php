@@ -41,7 +41,7 @@ class FactoryYamlFileLoaderDecorator extends AbstractYamlFileLoaderDecorator
                 $manufactoredServiceId = $id.'.'.$manufactoredServiceId;
                 $this->DUPLICATED_parseDefinition($manufactoredServiceId, $manufactoredService, $file);
                 $manufactoredServiceDef = $this->container->getDefinition($manufactoredServiceId);
-                $this->parseExtraDefinition($manufactoredServiceId, $manufactoredService, $file, $manufactoredServiceDef);
+                $manufactoredServiceDef = self::decorate()->parseExtraDefinition($manufactoredServiceId, $manufactoredService, $file, $manufactoredServiceDef);
                 $factoryExtra->addService($manufactoredServiceId);
                 $manufactoredServiceDef = $this->getDefinitionExtra($manufactoredServiceDef);
                 $this->container->setDefinition($manufactoredServiceId, $manufactoredServiceDef);
