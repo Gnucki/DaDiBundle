@@ -11,6 +11,7 @@
 
 namespace Da\DiBundle\DependencyInjection\Definition;
 
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 
 /**
@@ -31,10 +32,10 @@ class DefinitionDecoratorExtra extends DefinitionDecorator implements Definition
 	/**
      * Constructor.
      *
-     * @param Definition $definition The definition to extend.
      * @param string $parent The id of Definition instance to decorate.
+     * @param Definition $definition The definition to extend.
      */
-    public function __construct(Definition $definition = null, $parent)
+    public function __construct($parent, Definition $definition = null)
     {
         $this->implementor = new DefinitionExtraImplementor($this);
 

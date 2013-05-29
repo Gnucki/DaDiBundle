@@ -30,58 +30,10 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('da_di');
 
-        $this->addCompilationSection($rootNode);
-        $this->addRolesSection($rootNode);
-
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for
         // more information on that topic.
 
         return $treeBuilder;
-    }
-
-    /**
-     * compilation:
-     *     {compilation_id}:
-     *         default: {default_less_directory}
-     *         override: {override_less_directory}
-     *         source: {source_less_filename}
-     *         destination: {destination_css_filename}
-     */
-    private function addCompilationSection(ArrayNodeDefinition $rootNode)
-    {
-        $rootNode
-            ->children()
-                ->arrayNode('compilation')
-                   ->useAttributeAsKey('dumb')
-                    ->prototype('array')
-                        ->children()
-                            ->scalarNode('default')->end()
-                            ->scalarNode('override')->end()
-                            ->scalarNode('source')
-                                ->isRequired(true)
-                            ->end()
-                            ->scalarNode('destination')
-                                ->isRequired(true)
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
-            ->end()
-        ;
-    }
-
-    /**
-     * roles: [{role1}, {role2}]
-     */
-    private function addRolesSection(ArrayNodeDefinition $rootNode)
-    {
-        $rootNode
-            ->children()
-                ->arrayNode('roles')
-                    ->prototype('scalar')->end()
-                ->end()
-            ->end()
-        ;
     }
 }

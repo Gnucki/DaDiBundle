@@ -1,7 +1,7 @@
 {
     "name": "da/di-bundle",
     "type": "symfony-bundle",
-    "description": "Bundle allowing to compile less files",
+    "description": "Bundle allowing to add features to the dependency intection component",
     "keywords": ["di", "bundle", "da", "dependency", "injection"],
     "homepage": "http://github.com/Gnucki/DaDiBundle",
     "license": "MIT",

@@ -106,7 +106,7 @@ class ResolveFactoryDefinitionPass implements CompilerPassInterface
             if ($manufactoredServiceDef->getTags())
                 $def->setTags($manufactoredServiceDef->getTags());
             $def->unsetExtra('factory');
-            if (($extras = $manufactoredServiceDef->getExtras()))
+            if ($manufactoredServiceDef instanceof DefinitionExtraInterface && ($extras = $manufactoredServiceDef->getExtras()))
             {
                 foreach ($extras as $extraId => $extra)
                 {

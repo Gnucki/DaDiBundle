@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Da\DiBundle\DependencyInjection\Definition\DefinitionExtraInterface;
 
@@ -68,7 +69,9 @@ class CheckInterfaceValidityPass implements CompilerPassInterface
         $className = $definition->getClass();
 
         $class = new \ReflectionClass($className);
+        if (!interface_exists($interfaceName))
+            throw new InvalidArgumentException('Interface "'.$interfaceName.'" not found.');
         if (!$class->implementsInterface($interfaceName))
-        	throw new \InvalidArgumentException('The "'.$className.'" class of the "'.$id.'" service should implement the "'.$interfaceName.'" interface.');
+        	throw new RuntimeException('The class "'.$className.'" of the service "'.$id.'" should implement the interface "'.$interfaceName.'".');
     }
 }

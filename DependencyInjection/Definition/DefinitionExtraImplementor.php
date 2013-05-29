@@ -12,6 +12,7 @@
 namespace Da\DiBundle\DependencyInjection\Definition;
 
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 /**
  * DefinitionExtraImplementor is the class that contains the implementation
@@ -67,6 +68,16 @@ class DefinitionExtraImplementor implements DefinitionExtraInterface
             $this->abstraction->setExtras($definition->getExtras());
     }
 
+    /**
+	 * Get the abstracted definition.
+	 *
+	 * @return DefinitionExtraInterface The abstracted definition.
+	 */
+	public function getAbstraction()
+	{
+		return $this->abstraction;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
@@ -107,7 +118,7 @@ class DefinitionExtraImplementor implements DefinitionExtraInterface
 		foreach ($extraDefinitions as $extraDefinition)
 		{
 			if (!($extraDefinition instanceof ExtraDefinitionInterface))
-				throw new \InvalidArgumentException('The elements of the $extraDefinitions array should implement the ExtraDefinitionInterface interface.');
+				throw new InvalidArgumentException('The elements of the $extraDefinitions array should implement the ExtraDefinitionInterface interface.');
 		}
 		$this->extraDefinitions = $extraDefinitions;
 	}
