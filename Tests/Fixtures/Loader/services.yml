@@ -1,0 +1,12 @@
+services:
+    da.test:
+        interface: Da\DiBundle\Core\TestInterface
+        factory:
+            service1:
+                builder: da.test.builder 
+            service2: ~
+    da.test.builder:
+        class: Da\DiBundle\Core\TestBuilder
+    da.test.child:
+        parent: da.test.service1
+        builder: da.test.builder

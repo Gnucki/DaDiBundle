@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocatorInterface;
 use Da\DiBundle\DependencyInjection\Definition\DefinitionExtra;
+use Da\DiBundle\DependencyInjection\Definition\DefinitionDecoratorExtra;
 
 /**
  * YamlFileLoader loads YAML files service definitions.
@@ -177,7 +178,7 @@ class YamlFileLoader extends BaseYamlFileLoader
         if ($definition instanceof DefinitionExtraInterface)
             return $definition;
         else if ($definition instanceof DefinitionDecorator)
-            $def = new DefinitionDecoratorExtra($definition); // PARENT???
+            $def = new DefinitionDecoratorExtra($definition);
         else
             $def = new DefinitionExtra($definition);
         return $def;

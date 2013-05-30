@@ -35,14 +35,12 @@ class DefinitionDecoratorExtra extends DefinitionDecorator implements Definition
      * @param string $parent The id of Definition instance to decorate.
      * @param Definition $definition The definition to extend.
      */
-    public function __construct($parent, Definition $definition = null)
+    public function __construct(DefinitionDecorator $definition)
     {
         $this->implementor = new DefinitionExtraImplementor($this);
 
-        parent::__construct($parent);
-
-        if ($definition)
-            $this->assimilateDefinition($definition);
+        parent::__construct($definition->getParent());
+        $this->assimilateDefinition($definition);
     }
 
     /**

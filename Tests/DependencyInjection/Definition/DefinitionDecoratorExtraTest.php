@@ -12,6 +12,7 @@
 namespace Da\DiBundle\Tests\DependencyInjection\Definition;
 
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Da\DiBundle\DependencyInjection\Definition\DefinitionExtra;
 use Da\DiBundle\DependencyInjection\Definition\DefinitionDecoratorExtra;
 use Da\DiBundle\DependencyInjection\Definition\InterfaceExtraDefinition;
@@ -25,7 +26,7 @@ class DefinitionDecoratorExtraTest extends \PHPUnit_Framework_TestCase
 {
     private function getDefinitionExtra()
     {
-        return new DefinitionDecoratorExtra('service.parent');
+        return new DefinitionDecoratorExtra(new DefinitionDecorator('service.parent'));
     }
 
     /**

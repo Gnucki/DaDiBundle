@@ -45,13 +45,23 @@ abstract class AbstractYamlFileLoaderDecorator extends YamlFileLoader
     }
 
 	/**
+     * Get the parent of the decorator (see the pattern).
+     *
+     * @return YamlFileLoader The parent.
+     */
+    public function getParent()
+    {
+    	return $this->parent;
+    }
+
+    /**
      * Set the parent of the decorator (see the pattern).
      *
      * @param YamlFileLoader $parent The parent.
      */
     public function setParent(YamlFileLoader $parent)
     {
-    	$this->parent = $parent;
+        $this->parent = $parent;
     }
 
     /**
