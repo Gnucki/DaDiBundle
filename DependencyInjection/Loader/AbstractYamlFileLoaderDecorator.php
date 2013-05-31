@@ -12,8 +12,6 @@
 namespace Da\DiBundle\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Config\FileLocatorInterface;
 
 /**
  * AbstractYamlFileLoaderDecorator is an absctract class that a decorator 
@@ -21,33 +19,29 @@ use Symfony\Component\Config\FileLocatorInterface;
  *
  * @author Thomas Prelot
  */
-abstract class AbstractYamlFileLoaderDecorator extends YamlFileLoader
+abstract class AbstractYamlFileLoaderDecorator implements YamlFileLoaderInterface
 {
 	/**
 	 * The parent of the decorator (see the pattern).
 	 *
 	 * @var mixed
 	 */
-	protected $parent;
+	private $parent;
 
     /**
      * Constructor.
      *
-     * @param ContainerBuilder     $container A ContainerBuilder instance.
-     * @param FileLocatorInterface $locator   A FileLocator instance.
-     * @param YamlFileLoader       $parent    The parent (see pattern).
+     * @param YamlFileLoader $parent The parent (see pattern).
      */
-    public function __construct(ContainerBuilder $container, FileLocatorInterface $locator, YamlFileLoader $parent)
+    public function __construct(YamlFileLoaderInterface $parent)
     {
         $this->setParent($parent);
-
-        parent::__construct($container, $locator);
     }
 
 	/**
      * Get the parent of the decorator (see the pattern).
      *
-     * @return YamlFileLoader The parent.
+     * @return YamlFileLoaderInterface The parent.
      */
     public function getParent()
     {
@@ -57,18 +51,66 @@ abstract class AbstractYamlFileLoaderDecorator extends YamlFileLoader
     /**
      * Set the parent of the decorator (see the pattern).
      *
-     * @param YamlFileLoader $parent The parent.
+     * @param YamlFileLoaderInterface $parent The parent.
      */
-    public function setParent(YamlFileLoader $parent)
+    protected function setParent(YamlFileLoaderInterface $parent)
     {
         $this->parent = $parent;
     }
 
     /**
-	 * {@inheritdoc}
-	 */
-    protected function parseExtraDefinition($id, $service, $file, Definition $definition)
+     * {@inheritdoc}
+     */
+    public function getContainer()
     {
-        return $this->parent->parseExtraDefinition($id, $service, $file, $definition);
+        return $this->getParent()->getContainer();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDecoratedInstance()
+    {
+        return $this->getParent()->getDecoratedInstance();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function load($file, $type = null)
+    {
+        return $this->getParent()->load($file, $type);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function parseExtraDefinition($id, $service, $file, Definition $definition)
+    {
+        return $this->getParent()->parseExtraDefinition($id, $service, $file, $definition);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefinitionExtra(Definition $definition)
+    {
+        return $this->getParent()->getDefinitionExtra($definition);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function parseDefinitionAccess($id, $service, $file)
+    {
+        return $this->getParent()->parseDefinitionAccess($id, $service, $file);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resolveServicesAccess($value)
+    {
+        return $this->getParent()->resolveServicesAccess($value);
     }
 }

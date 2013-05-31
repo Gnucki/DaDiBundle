@@ -42,6 +42,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
      * @covers Da\DiBundle\DependencyInjection\Loader\AbstractYamlFileLoaderDecorator::__construct
      * @covers Da\DiBundle\DependencyInjection\Loader\AbstractYamlFileLoaderDecorator::setParent
      * @covers Da\DiBundle\DependencyInjection\Loader\AbstractYamlFileLoaderDecorator::getParent
+     * @runInSeparateProcess
      */
     public function testDecorate()
     {
@@ -64,7 +65,16 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
      * @covers Da\DiBundle\DependencyInjection\Loader\YamlFileLoader::load
      * @covers Da\DiBundle\DependencyInjection\Loader\YamlFileLoader::loadFile
      * @covers Da\DiBundle\DependencyInjection\Loader\YamlFileLoader::getDefinitionExtra
+     * @covers Da\DiBundle\DependencyInjection\Loader\YamlFileLoader::parseDefinitionAccess
+     * @covers Da\DiBundle\DependencyInjection\Loader\YamlFileLoader::resolveServicesAccess
+     * @covers Da\DiBundle\DependencyInjection\Loader\YamlFileLoader::DUPLICATED_parseDefinition
      * @covers Da\DiBundle\DependencyInjection\Loader\YamlFileLoader::DUPLICATED_resolveServices
+     * @covers Da\DiBundle\DependencyInjection\Loader\YamlFileLoader::getContainer
+     * @covers Da\DiBundle\DependencyInjection\Loader\YamlFileLoader::getDecoratedInstance
+     * @covers Da\DiBundle\DependencyInjection\Loader\AbstractYamlFileLoaderDecorator::load
+     * @covers Da\DiBundle\DependencyInjection\Loader\AbstractYamlFileLoaderDecorator::parseDefinitionAccess
+     * @covers Da\DiBundle\DependencyInjection\Loader\AbstractYamlFileLoaderDecorator::resolveServicesAccess
+     * @runInSeparateProcess
      */
     public function testParseExtraDefinitions()
     {

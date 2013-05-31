@@ -25,7 +25,7 @@ class BuilderYamlFileLoaderDecorator extends AbstractYamlFileLoaderDecorator
     /**
 	 * {@inheritdoc}
 	 */
-    protected function parseExtraDefinition($id, $service, $file, Definition $definition)
+    public function parseExtraDefinition($id, $service, $file, Definition $definition)
     {
         $def = $definition;
 
@@ -46,10 +46,10 @@ class BuilderYamlFileLoaderDecorator extends AbstractYamlFileLoaderDecorator
 	        	$builderExtra->setService($service['builder']);
 
             // Add the extra definition to the definition.
-            $def = $this->getDefinitionExtra($definition);
+            $def = $this->getDecoratedInstance()->getDefinitionExtra($definition);
             $def->setExtra('builder', $builderExtra);
         }
 
-        return $this->parent->parseExtraDefinition($id, $service, $file, $def);
+        return $this->getParent()->parseExtraDefinition($id, $service, $file, $def);
     }
 }

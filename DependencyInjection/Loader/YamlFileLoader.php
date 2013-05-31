@@ -26,7 +26,7 @@ use Da\DiBundle\DependencyInjection\Definition\DefinitionDecoratorExtra;
  *
  * @author Thomas Prelot
  */
-class YamlFileLoader extends BaseYamlFileLoader
+class YamlFileLoader extends BaseYamlFileLoader implements YamlFileLoaderInterface
 {
 	/**
 	 * The content of the loaded file.
@@ -98,17 +98,30 @@ class YamlFileLoader extends BaseYamlFileLoader
             $decorators = self::$decorators;
 			while (($decorator = array_pop($decorators)))
 			{
-                self::$decoratedInstance = new $decorator['name']($container, $locator, self::$decoratedInstance);
+                self::$decoratedInstance = new $decorator['name'](self::$decoratedInstance);
 			}
 		}
 		return self::$decoratedInstance;
 	}
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getContainer()
+    {
+        return $this->container;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDecoratedInstance()
+    {
+        return self::$decoratedInstance;
+    }
+
 	/**
-     * Loads a Yaml file.
-     *
-     * @param mixed  $file The resource
-     * @param string $type The resource type
+     * {@inheritdoc}
      */
     public function load($file, $type = null)
     {
@@ -144,36 +157,23 @@ class YamlFileLoader extends BaseYamlFileLoader
         foreach ($content['services'] as $id => $service) 
         {
         	$definition = $this->container->getDefinition($id);
-            $definition = $this->parseExtraDefinition($id, $service, $file, $definition);
+            $definition = $this->getDecoratedInstance()->parseExtraDefinition($id, $service, $file, $definition);
             $this->container->setDefinition($id, $definition);
         }
     }
 
     /**
-     * Parses an extra definition.
-     *
-     * @param string     $id
-     * @param array      $service
-     * @param string     $file
-     * @param Definition $definition
-     *
-     * @return Definition The new definition.
-     *
-     * @throws InvalidArgumentException When the format of a parameter is bad.
+     * {@inheritdoc}
      */
-    protected function parseExtraDefinition($id, $service, $file, Definition $definition)
+    public function parseExtraDefinition($id, $service, $file, Definition $definition)
     {
         return $definition;
     }
 
     /**
-     * Get a definition with extra parameters.
-     *
-     * @param Definition $definition The initial definition.
-     *
-     * @return Definition The definition with extra parameters.
+     * {@inheritdoc}
      */
-    protected function getDefinitionExtra(Definition $definition)
+    public function getDefinitionExtra(Definition $definition)
     {
         if ($definition instanceof DefinitionExtraInterface)
             return $definition;
@@ -182,6 +182,22 @@ class YamlFileLoader extends BaseYamlFileLoader
         else
             $def = new DefinitionExtra($definition);
         return $def;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function parseDefinitionAccess($id, $service, $file)
+    {
+        return $this->DUPLICATED_parseDefinition($id, $service, $file);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resolveServicesAccess($value)
+    {
+        return $this->DUPLICATED_resolveServices($value);
     }
 
     /**
@@ -249,24 +265,24 @@ class YamlFileLoader extends BaseYamlFileLoader
         }
 
         if (isset($service['arguments'])) {
-            $definition->setArguments($this->DUPLICATED_resolveServices($service['arguments']));
+            $definition->setArguments($this->getDecoratedInstance()->resolveServices($service['arguments']));
         }
 
         if (isset($service['properties'])) {
-            $definition->setProperties($this->DUPLICATED_resolveServices($service['properties']));
+            $definition->setProperties($this->getDecoratedInstance()->resolveServices($service['properties']));
         }
 
         if (isset($service['configurator'])) {
             if (is_string($service['configurator'])) {
                 $definition->setConfigurator($service['configurator']);
             } else {
-                $definition->setConfigurator(array($this->DUPLICATED_resolveServices($service['configurator'][0]), $service['configurator'][1]));
+                $definition->setConfigurator(array($this->getDecoratedInstance()->resolveServices($service['configurator'][0]), $service['configurator'][1]));
             }
         }
 
         if (isset($service['calls'])) {
             foreach ($service['calls'] as $call) {
-                $args = isset($call[1]) ? $this->DUPLICATED_resolveServices($call[1]) : array();
+                $args = isset($call[1]) ? $this->getDecoratedInstance()->resolveServices($call[1]) : array();
                 $definition->addMethodCall($call[0], $args);
             }
         }

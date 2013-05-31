@@ -25,7 +25,7 @@ class FactoryYamlFileLoaderDecorator extends AbstractYamlFileLoaderDecorator
     /**
 	 * {@inheritdoc}
 	 */
-    protected function parseExtraDefinition($id, $service, $file, Definition $definition)
+    public function parseExtraDefinition($id, $service, $file, Definition $definition)
     {
         $def = $definition;
 
@@ -39,20 +39,20 @@ class FactoryYamlFileLoaderDecorator extends AbstractYamlFileLoaderDecorator
             foreach ($service['factory'] as $manufactoredServiceId => $manufactoredService) 
             {
                 $manufactoredServiceId = $id.'.'.$manufactoredServiceId;
-                $this->DUPLICATED_parseDefinition($manufactoredServiceId, $manufactoredService, $file);
-                $manufactoredServiceDef = $this->container->getDefinition($manufactoredServiceId);
-                $manufactoredServiceDef = self::decorate()->parseExtraDefinition($manufactoredServiceId, $manufactoredService, $file, $manufactoredServiceDef);
+                $this->getDecoratedInstance()->parseDefinitionAccess($manufactoredServiceId, $manufactoredService, $file);
+                $manufactoredServiceDef = $this->getContainer()->getDefinition($manufactoredServiceId);
+                $manufactoredServiceDef = $this->getDecoratedInstance()->parseExtraDefinition($manufactoredServiceId, $manufactoredService, $file, $manufactoredServiceDef);
                 $factoryExtra->addService($manufactoredServiceId);
-                $manufactoredServiceDef = $this->getDefinitionExtra($manufactoredServiceDef);
-                $this->container->setDefinition($manufactoredServiceId, $manufactoredServiceDef);
+                $manufactoredServiceDef = $this->getDecoratedInstance()->getDefinitionExtra($manufactoredServiceDef);
+                $this->getContainer()->setDefinition($manufactoredServiceId, $manufactoredServiceDef);
             }
 
             // Add the extra definition to the definition.
-            $def = $this->getDefinitionExtra($definition);
+            $def = $this->getDecoratedInstance()->getDefinitionExtra($definition);
             $def->setExtra('factory', $factoryExtra);
             $def->setAbstract(true);
         }
 
-        return $this->parent->parseExtraDefinition($id, $service, $file, $def);
+        return $this->getParent()->parseExtraDefinition($id, $service, $file, $def);
     }
 }

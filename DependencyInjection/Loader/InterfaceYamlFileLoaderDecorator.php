@@ -25,7 +25,7 @@ class InterfaceYamlFileLoaderDecorator extends AbstractYamlFileLoaderDecorator
     /**
 	 * {@inheritdoc}
 	 */
-    protected function parseExtraDefinition($id, $service, $file, Definition $definition)
+    public function parseExtraDefinition($id, $service, $file, Definition $definition)
     {
         $def = $definition;
 
@@ -36,10 +36,10 @@ class InterfaceYamlFileLoaderDecorator extends AbstractYamlFileLoaderDecorator
             $interfaceExtra->setName($service['interface']);
 
             // Add the extra definition to the definition.
-            $def = $this->getDefinitionExtra($definition);
+            $def = $this->getDecoratedInstance()->getDefinitionExtra($definition);
             $def->setExtra('interface', $interfaceExtra);
         }
 
-        return $this->parent->parseExtraDefinition($id, $service, $file, $def);
+        return $this->getParent()->parseExtraDefinition($id, $service, $file, $def);
     }
 }
