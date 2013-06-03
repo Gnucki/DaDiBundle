@@ -26,8 +26,8 @@ class BuilderYamlFileLoaderDecoratorTest extends \PHPUnit_Framework_TestCase
     {
         return array
             (
-                array(array('builder' => array('service' => 'service', 'method' => 'get', 'class' => 'Class'))),
-                array(array('builder' => 'service'))
+                array(array('builder' => array('service' => 'builder', 'method' => 'get', 'class' => 'Class'))),
+                array(array('builder' => 'builder'))
             );
     }
 
