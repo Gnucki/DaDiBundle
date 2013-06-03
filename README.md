@@ -76,7 +76,7 @@ services:
 
 The paramater `factory` allows you to organize your services which have the same responsability:
 
-``` bash
+``` yaml
 services:
     me-file.parser:
     	interface: Me\FileBundle\Parser\ParserInterface
