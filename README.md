@@ -26,7 +26,7 @@ new Da\DiBundle\DaDiBundle(),
 ```
 
 You should now be able to use the DaDiBundle.
-To use the features of this bundle, you have to use a new `FileLoader` in your dependency injection:
+To benefit of the features of this bundle, you have to use a new `FileLoader` in your dependency injection:
 
 ``` php
 // Me/MyBundle/DependencyInjection/MeMyBundleExtension.php
@@ -62,7 +62,7 @@ This bundle adds some new parameters to help you and demonstrates how you could 
 
 The paramater `interface` allows you to check that a service implements an interface:
 
-``` bash
+``` yaml
 parameters:
     router.class: Me\MyRoutingBundle\Router
 
@@ -97,7 +97,7 @@ The service `me-file.parser` is a factory you can use like that in a controller:
 	$yamlParser = $this->container->get('me-file.parser')->get('yaml');
 ```
 
->**Note**
+>**Note:**
 >All the parameters of the factory are applied to its manufactored services.
 >In this example, the services `me-file.parser.yaml` and `me-file.parser.xml` have to implement the interface `Me\FileBundle\Parser\ParserInterface` define at the `me-file.parser` level.
 >The service `me-file.parser.php` overrides the `interface` parameter and has to implement the interface `Me\FileBundle\Parser\CodeParserInterface` instead.
@@ -106,7 +106,7 @@ The service `me-file.parser` is a factory you can use like that in a controller:
 
 The paramater `builder` is just a syntaxic sugar that helps to differentiate the `factory` parameter from the native `factory_class`, `factory_method`, `factory_service`:
 
-``` bash
+``` yaml
 services:
     me-file.lexer:
     	builder:
@@ -118,7 +118,7 @@ services:
 
 is equivalent to:
 
-``` bash
+``` yaml
 services:
     me-file.lexer:
     	builder: me-file.lexer.builder # build is the default name of the method.
@@ -128,7 +128,7 @@ services:
 
 is equivalent to:
 
-``` bash
+``` yaml
 services:
     me-file.lexer:
     	factory_method: build
@@ -200,8 +200,8 @@ class InterfaceYamlFileLoaderDecorator extends AbstractYamlFileLoaderDecorator
 }
 ```
 
->This decorator (see the design pattern) takes the parameter `interface` into account and add it as an extra definition in the definition of the service.
->You have to declare it in your bundle:
+This decorator (see the design pattern) takes the parameter `interface` into account and add it as an extra definition in the definition of the service.
+You have to declare it in your bundle:
 
 ``` php
 // Da/DiBundle/DependencyInjection/Compiler/CheckInterfaceValidityPass.php
@@ -226,7 +226,7 @@ class DaDiBundle extends Bundle
 }
 ```
 
-# Add a compiler pass
+### Add a compiler pass
 
 ``` php
 // Da/DiBundle/DependencyInjection/Compiler/CheckInterfaceValidityPass.php
@@ -276,8 +276,8 @@ class CheckInterfaceValidityPass implements CompilerPassInterface
 }
 ```
 
->This compiler pass checks that your service implements the defined interface.
->You have to declare it in your bundle:
+This compiler pass checks that your service implements the defined interface.
+You have to declare it in your bundle:
 
 ``` php
 // Da/DiBundle/DaDiBundle.php
@@ -312,4 +312,4 @@ All the features have been, for the time being, only developped for yaml configu
 Tests
 -----
 
-As the developpement of new parameters can affect others, you can run phpunit on this bundle to check that all the features are still ok.
+As the developpement of new parameters can affect others, you can run phpunit on this bundle to check that all the features are still ok after developping your own.
