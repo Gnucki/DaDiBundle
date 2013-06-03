@@ -68,7 +68,6 @@ class YamlFileLoader extends BaseYamlFileLoader implements YamlFileLoaderInterfa
                 self::$decorators = array_merge(array_slice(self::$decorators, 0, $i), array(array('order' => $order, 'name' => $decoratorClassName)), array_values(array_slice(self::$decorators, $i)));
                 $isDecoratorAdded = true;
             }
-            
         }
         if (!$isDecoratorAdded)
            self::$decorators[] = array('order' => $order, 'name' => $decoratorClassName);

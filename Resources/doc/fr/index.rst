@@ -1,2 +1,0 @@
-Documentation du DaDiBundle
-===========================
