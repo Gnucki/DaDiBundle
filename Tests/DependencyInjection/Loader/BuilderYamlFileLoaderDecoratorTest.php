@@ -26,8 +26,8 @@ class BuilderYamlFileLoaderDecoratorTest extends \PHPUnit_Framework_TestCase
     {
         return array
             (
-                array(array('builder' => array('service' => 'builder', 'method' => 'get', 'class' => 'Class'))),
-                array(array('builder' => 'builder'))
+                array(array('builder' => array('service' => 'service', 'method' => 'get', 'class' => 'Class'))),
+                array(array('builder' => 'service'))
             );
     }
 
@@ -46,7 +46,7 @@ class BuilderYamlFileLoaderDecoratorTest extends \PHPUnit_Framework_TestCase
         $definition = $loader->parseExtraDefinition('service', $service, 'dumbFile', $definition);
 
         $this->assertNotNull($definition->getExtra('builder'), '->parseExtraDefinition() adds an extra definition "builder"');
-        if (isset($service['builder']['service']))
+        if (array_key_exists('service', $service['builder']))
             $this->assertEquals($service['builder']['service'], $definition->getExtra('builder')->getService(), '->parseExtraDefinition() sets the service of the builder in the definition');
         else
             $this->assertEquals($service['builder'], $definition->getExtra('builder')->getService(), '->parseExtraDefinition() sets the service of the builder in the definition');
